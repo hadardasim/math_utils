@@ -44,8 +44,8 @@ def create_bspline(k, y_values, x_values=None, clamped=True, fix_shift=True, ext
         dy_start = y_values[1] - y_values[0]
         dy_end = y_values[-1] - y_values[-2]
 
-        control_points = list(y_values[0] + np.linspace(-rep, -1, rep) * dy_start/dx_start) + y_values + \
-                         list(y_values[-1] + np.linspace(1, rep, rep) * dy_end/dx_end)
+        control_points = list(y_values[0] + np.outer(np.linspace(-rep, -1, rep), dy_start/dx_start)) + list(y_values) + \
+                         list(y_values[-1] + np.outer(np.linspace(1, rep, rep) , dy_end/dx_end))
     else:
         control_points = y_values
 
@@ -55,8 +55,8 @@ def create_bspline(k, y_values, x_values=None, clamped=True, fix_shift=True, ext
     # extend the tail of x_values
     knots = x_values + list(x_values[-1] + np.linspace(1, k - left_shift + 1, k - left_shift + 1) * dx_end)
 
-    print 'knots=', knots
-    print 'control=', control_points
+    #print 'knots=', knots
+    #print 'control=', control_points
 
     return BSpline(knots, control_points, k, extrapolate=extrapolate)
 
@@ -65,8 +65,27 @@ if __name__ == "__main__":
 
     import matplotlib.pyplot as plt
 
+    # ==================
+    # 2D spline examples
+
+    xy_in = np.asarray([[0,0], [1,0], [1,1], [0,1], [-1, 0]])
+    spl_2d = create_bspline(3, xy_in)
+    tt = np.linspace(0, len(xy_in)-1, 100)
+    xy_out = spl_2d(tt)
+
+    fig, ax = plt.subplots()
+    ax.plot(xy_in[:, 0], xy_in[:, 1], 'o', label='control points')
+    ax.plot(xy_out[:, 0], xy_out[:, 1], '-', lw=3, alpha=0.7, label='BSpline k = 3')
+    ax.grid(True)
+    ax.legend(loc='best')
+    plt.title('2d spline')
+    plt.show()
+
     # y = [3.0, 0.0, 1.0, 2.0, 1.0, 3.0, 2.5, 0.5, 1.0]
     # y = [4, 4, 4.0, 0.0, 3.0, 0.0, 2.0, 0.0, 3.0, 3, 3]
+
+    # ===================
+    # 1D spline examples
 
     y = [4.0, 0.0, 3.0, 0.0, 2.0, 0.0, 3.0]
     x = range(0, len(y))
