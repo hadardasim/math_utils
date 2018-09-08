@@ -55,9 +55,6 @@ def create_bspline(k, y_values, x_values=None, clamped=True, fix_shift=True, ext
     # extend the tail of x_values
     knots = x_values + list(x_values[-1] + np.linspace(1, k - left_shift + 1, k - left_shift + 1) * dx_end)
 
-    #print 'knots=', knots
-    #print 'control=', control_points
-
     return BSpline(knots, control_points, k, extrapolate=extrapolate)
 
 
@@ -136,9 +133,9 @@ if __name__ == "__main__":
     plt.show()
 
     fig, ax = plt.subplots()
-    ax.plot(xx, spl3(xx, nu=0), '-', lw=3, alpha=0.7, label='BSpline nu = 0 (pos)')
-    ax.plot(xx, spl3(xx, nu=1), 'b-', lw=3, alpha=0.7, label='BSpline nu = 1 (vel)')
-    ax.plot(xx, spl3(xx, nu=2), 'g-', lw=3, alpha=0.7, label='BSpline nu = 2 (acc)')
+    ax.plot(xx, spl3(xx, nu=0), '-', lw=3, alpha=0.7, label='BSpline nu = 0 (pos c2)')
+    ax.plot(xx, spl3(xx, nu=1), 'b-', lw=3, alpha=0.7, label='BSpline nu = 1 (vel c1)')
+    ax.plot(xx, spl3(xx, nu=2), 'g-', lw=3, alpha=0.7, label='BSpline nu = 2 (acc c0)')
 
     ax.grid(True)
     ax.legend(loc='best')
