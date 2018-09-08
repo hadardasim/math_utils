@@ -44,8 +44,13 @@ def create_bspline(k, y_values, x_values=None, clamped=True, fix_shift=True, ext
         dy_start = y_values[1] - y_values[0]
         dy_end = y_values[-1] - y_values[-2]
 
-        control_points = list(y_values[0] + np.outer(np.linspace(-rep, -1, rep), dy_start/dx_start)) + list(y_values) + \
-                         list(y_values[-1] + np.outer(np.linspace(1, rep, rep) , dy_end/dx_end))
+        def my_outer(scale_vector, point):
+            if isinstance(point, (list, np.ndarray)):
+                return np.outer(scale_vector, point)
+            return scale_vector*point
+
+        control_points = list(y_values[0] + my_outer(np.linspace(-rep, -1, rep), dy_start)) + list(y_values) +\
+                         list(y_values[-1] + my_outer(np.linspace(1, rep, rep), dy_end))
     else:
         control_points = y_values
 
