@@ -28,6 +28,10 @@ def create_bspline(k, y_values, x_values=None, clamped=False, fix_shift=True):
     if fix_shift:
         left_shift = 1 + int(max(k-1, 0)/2)
         x_values = list(x_values[0] + np.linspace(-left_shift, -1, left_shift) * dx_start) + x_values
+
+        if k > 0 and k % 2 == 0:
+            # add one fake key at the beginning and get the average of each 2 adjacent keys
+            x_values = [x_values[0] - dx_start*0.5] + list(0.5*np.array(x_values[0:-1]) + 0.5*np.array(x_values[1:]))
     else:
         left_shift = 0
 
