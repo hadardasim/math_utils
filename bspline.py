@@ -27,13 +27,13 @@ def create_bspline(k, y_values, x_values=None, clamped=False, fix_shift=True):
 
     if fix_shift:
         left_shift = 1 + int(max(k-1, 0)/2)
+        x_values = list(x_values[0] + np.linspace(-left_shift, -1, left_shift) * dx_start) + x_values
     else:
         left_shift = 0
 
     if clamped:
         rep = max(k-1, 0)
-        left_rep = rep + left_shift
-        x_values = list(x_values[0] + np.linspace(-left_rep, -1, left_rep) * dx_start) + x_values + \
+        x_values = list(x_values[0] + np.linspace(-rep, -1, rep) * dx_start) + x_values + \
                    list(x_values[-1] + np.linspace(1, rep, rep) * dx_end)
         dy_start = y_values[1] - y_values[0]
         dy_end = y_values[-1] - y_values[-2]
