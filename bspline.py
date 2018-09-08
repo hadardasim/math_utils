@@ -6,15 +6,17 @@ import numpy as np
 # http://web.mit.edu/hyperbook/Patrikalakis-Maekawa-Cho/node17.html
 
 
-def create_bspline(k, y_values, x_values=None, clamped=False, fix_shift=True):
+def create_bspline(k, y_values, x_values=None, clamped=True, fix_shift=True, extrapolate=True):
     """
     create bspline curve of degree k that follows y_values.
     note that in general, the curve will not pass the y_values
     :param k: spline order / degree. higher value will make the spline smoother and include more neighbors
     :param y_values: list / array of control points
     :param x_values: [optional] ascending list / array scalar in of size len(y_values)
-    :param clamped:
-    :param fix_shift:
+    :param clamped: if true the spline will go through both end points
+    :param fix_shift: adjust x axis to better match the control points
+    :param extrapolate: see documentation of scipy.interpolate bspline. for debugging it is recommended to set this value
+    to False
     :return: bspline
     """
 
@@ -56,10 +58,7 @@ def create_bspline(k, y_values, x_values=None, clamped=False, fix_shift=True):
     print 'knots=', knots
     print 'control=', control_points
 
-    # knots = np.array(knots) - (k - 1) * 0.5
-    return BSpline(knots, control_points, k, extrapolate=False)
-
-
+    return BSpline(knots, control_points, k, extrapolate=extrapolate)
 
 
 if __name__ == "__main__":
@@ -71,8 +70,12 @@ if __name__ == "__main__":
 
     y = [4.0, 0.0, 3.0, 0.0, 2.0, 0.0, 3.0]
     x = range(0, len(y))
-    for ind in range(3, len(x)):
-        x[ind] += 2
+
+    uniform = False
+    if not uniform:
+        for ind in range(3, len(x)):
+            x[ind] += 2
+        x[-1] += 1
 
     x_2_y = dict()
     for ind in range(len(x)):
@@ -80,15 +83,17 @@ if __name__ == "__main__":
     print('x->y ', x_2_y)
 
     clamped = True
-    spl0 = create_bspline(0, y, x, clamped=clamped)
-    spl1 = create_bspline(1, y, x, clamped=clamped)
-    spl2 = create_bspline(2, y, x, clamped=clamped)
-    spl3 = create_bspline(3, y, x, clamped=clamped)
-    spl4 = create_bspline(4, y, x, clamped=clamped)
+    fix_shift = True
+    spl0 = create_bspline(0, y, x, clamped=clamped, fix_shift=fix_shift, extrapolate=False)
+    spl1 = create_bspline(1, y, x, clamped=clamped, fix_shift=fix_shift, extrapolate=False)
+    spl2 = create_bspline(2, y, x, clamped=clamped, fix_shift=fix_shift, extrapolate=False)
+    spl3 = create_bspline(3, y, x, clamped=clamped, fix_shift=fix_shift, extrapolate=False)
+    spl4 = create_bspline(4, y, x, clamped=clamped, fix_shift=fix_shift, extrapolate=False)
     x_trim = 0
     xx = np.linspace(x_trim + x[0], x[-1] - x_trim, 500)
 
     fig, ax = plt.subplots()
+    ax.plot(x, y, 'o', label='control points')
     ax.plot(xx, spl0(xx), '-', lw=3, alpha=0.7, label='BSpline k = 0')
     ax.plot(xx, spl1(xx), 'b-', lw=3, alpha=0.7, label='BSpline k = 1')
     ax.plot(xx, spl2(xx), 'g-', lw=3, alpha=0.7, label='BSpline k = 2')
@@ -96,7 +101,7 @@ if __name__ == "__main__":
     ax.plot(xx, spl4(xx), '-', lw=3, alpha=0.7, label='BSpline k = 4')
     ax.grid(True)
     ax.legend(loc='best')
-    plt.title('y={}, clamped={}\nx={}'.format(y, clamped, x))
+    plt.title('clamped={}, uniform={}, shift_fix={}'.format(clamped, uniform, fix_shift))
     plt.show()
 
     nu = 1
